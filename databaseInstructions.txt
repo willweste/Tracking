@@ -1,0 +1,17 @@
+ID: A unique identifier for each bug report. This field can be an auto-incrementing integer or a generated UUID.
+
+Title: A concise and descriptive title or summary of the bug.
+
+Description: A detailed description of the bug, including steps to reproduce, expected behavior, and observed behavior. This field allows users to provide comprehensive information about the bug.
+
+Status: The current status of the bug, such as "Open," "In Progress," "Resolved," or "Closed." This field helps track the progress of the bug and identify its current state.
+
+Severity: The level of impact or severity of the bug, often categorized as "Low," "Medium," or "High." This field helps prioritize bug fixes based on their impact on the application.
+
+Assigned To: The developer or team responsible for fixing the bug. This field can store the name, username, or unique identifier of the assigned developer.
+
+Reported By: The user who reported the bug. This field can store the name, username, or unique identifier of the user who created the bug report.
+
+Created At: The timestamp indicating when the bug report was created. This field helps track the creation time of the bug.
+
+Updated At: The timestamp indicating the last time the bug report was updated. This field helps track the most recent update or modification made to the bug report.

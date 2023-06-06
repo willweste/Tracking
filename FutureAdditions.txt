@@ -1,0 +1,1 @@
+add a real time support feature that takes use of a chatbot ai to help solve problems on the fly.
