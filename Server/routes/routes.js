@@ -27,6 +27,20 @@ router.get("/api/bugs", (req, res) => {
   });
 });
 
+// Delete a bug from the database
+router.delete("/api/bugs/:id", (req, res) => {
+  const bugId = req.params.id;
+
+  const sqlDelete = "DELETE FROM Bugs WHERE id = ?";
+  db.query(sqlDelete, bugId, (err, result) => {
+    if (err) {
+      res.status(500).send("Error deleting bug from the database");
+    } else {
+      res.json({ bugId });
+    }
+  });
+});
+
 router.post("/api/create", (req, res) => {
   const { title, description } = req.body;
 

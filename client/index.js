@@ -69,3 +69,49 @@ function displayBug(title, description, id) {
   `;
   tableBody.appendChild(newRow);
 }
+
+tableBody.addEventListener("click", function (event) {
+  if (event.target.classList.contains("delete-button")) {
+    const bugId = event.target.dataset.bugId;
+    deleteBug(bugId);
+  }
+});
+
+function deleteBug(bugId) {
+  fetch(`http://localhost:5000/api/bugs/${bugId}`, {
+    method: "DELETE",
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Bug deleted with ID:", data.bugId);
+      removeBugFromTable(data.bugId);
+    })
+    .catch((error) => {
+      console.log("Error deleting bug:", error);
+    });
+}
+
+function removeBugFromTable(bugId) {
+  const rowToRemove = tableBody.querySelector(`[data-bug-id="${bugId}"]`);
+  if (rowToRemove) {
+    rowToRemove.remove();
+    refreshBugData();
+  }
+}
+
+function refreshBugData() {
+  fetch("http://localhost:5000/api/bugs")
+    .then((response) => response.json())
+    .then((data) => {
+      // Clear the table
+      tableBody.innerHTML = "";
+
+      // Loop through the bugs data and generate table rows
+      data.forEach((bug) => {
+        displayBug(bug.title, bug.description, bug.id);
+      });
+    })
+    .catch((error) => {
+      console.log("Error retrieving bugs:", error);
+    });
+}
