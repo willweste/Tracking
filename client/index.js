@@ -16,7 +16,7 @@ bugForm.addEventListener("submit", function (event) {
     description: descriptionInput.value,
   };
 
-  fetch("http://localhost:5000/api/create", {
+  fetch("http://localhost:5000/api/bugs/create", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -29,7 +29,7 @@ bugForm.addEventListener("submit", function (event) {
       console.log("Bug created with ID:", data.bugId);
 
       // Display the new bug in the table
-      displayBug(bug.title, bug.description);
+      displayBug(data.bugId, bug.title, bug.description);
     })
     .catch((error) => {
       console.log("Error creating bug:", error);
@@ -50,7 +50,7 @@ fetch("http://localhost:5000/api/bugs")
   .then((data) => {
     // Loop through the bugs data and generate table rows
     data.forEach((bug) => {
-      displayBug(bug.title, bug.description, bug.id);
+      displayBug(bug.id, bug.title, bug.description);
     });
   })
   .catch((error) => {
@@ -59,7 +59,7 @@ fetch("http://localhost:5000/api/bugs")
 
 const tableBody = document.querySelector("#bugTable tbody");
 
-function displayBug(title, description, id) {
+function displayBug(id, title, description) {
   const newRow = document.createElement("tr");
   newRow.innerHTML = `
     <td>${title}</td>
@@ -67,6 +67,7 @@ function displayBug(title, description, id) {
     <td>${id}</td>
     <td><button class="delete-button" data-bug-id="${id}">Delete</button></td>
   `;
+  newRow.setAttribute("data-bug-id", id); // Assign a unique identifier
   tableBody.appendChild(newRow);
 }
 
@@ -84,34 +85,16 @@ function deleteBug(bugId) {
     .then((response) => response.json())
     .then((data) => {
       console.log("Bug deleted with ID:", data.bugId);
-      removeBugFromTable(data.bugId);
+
+      // Remove the corresponding row from the table
+      const rowToDelete = document.querySelector(
+        `#bugTable tr[data-bug-id="${data.bugId}"]`
+      );
+      if (rowToDelete) {
+        rowToDelete.remove();
+      }
     })
     .catch((error) => {
       console.log("Error deleting bug:", error);
-    });
-}
-
-function removeBugFromTable(bugId) {
-  const rowToRemove = tableBody.querySelector(`[data-bug-id="${bugId}"]`);
-  if (rowToRemove) {
-    rowToRemove.remove();
-    refreshBugData();
-  }
-}
-
-function refreshBugData() {
-  fetch("http://localhost:5000/api/bugs")
-    .then((response) => response.json())
-    .then((data) => {
-      // Clear the table
-      tableBody.innerHTML = "";
-
-      // Loop through the bugs data and generate table rows
-      data.forEach((bug) => {
-        displayBug(bug.title, bug.description, bug.id);
-      });
-    })
-    .catch((error) => {
-      console.log("Error retrieving bugs:", error);
     });
 }
