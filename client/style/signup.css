@@ -16,6 +16,7 @@ form {
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  position: relative; /* Add this line to make the form a positioned parent */
 }
 
 label {
@@ -33,7 +34,7 @@ input[type="password"] {
   border-radius: 5px;
   border: 1px solid #ccc;
   margin-bottom: 16px;
-  box-sizing: border-box; /* Add this line to include padding and border in the width */
+  box-sizing: border-box;
 }
 
 button {
@@ -48,4 +49,22 @@ button {
 
 button:hover {
   background-color: #45a049;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.login-container {
+  display: flex;
+  align-items: center;
+}
+
+.login-container p {
+  margin-right: 10px;
+}
+
+#text {
+  font-size: small;
 }
