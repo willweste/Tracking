@@ -21,6 +21,7 @@ const signup = (req, res) => {
           console.log("Error in signup:", err);
         } else {
           res.json({ message: "User registered successfully" });
+          console.log("User registered succesfully");
         }
       });
     }
@@ -52,6 +53,7 @@ const login = (req, res) => {
           } else {
             if (isMatch) {
               res.json({ message: "User logged in successfully" });
+              console.log("User logged in successfully");
             } else {
               res.status(401).json({ error: "Invalid email or password" });
             }
