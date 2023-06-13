@@ -11,6 +11,7 @@ const signup = (req, res) => {
   db.query(sqlInsert, [username, email, password], (err, result) => {
     if (err) {
       res.status(500).json({ error: err.message });
+      console.log("This shit don't work in the backend");
     } else {
       res.json({ userId: result.insertId });
     }
