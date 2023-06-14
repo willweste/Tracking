@@ -1,5 +1,6 @@
 const db = require("../db");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 // User Registration
 const signup = (req, res) => {
@@ -7,10 +8,9 @@ const signup = (req, res) => {
 
   // TODO: Implement validation for username, email, and password
 
-  // Generate a salt and hash the password
   bcrypt.hash(password, 10, (err, hashedPassword) => {
     if (err) {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ error: "Server Error" });
       console.log("Error in signup:", err);
     } else {
       const sqlInsert =
@@ -20,8 +20,8 @@ const signup = (req, res) => {
           res.status(500).json({ error: err.message });
           console.log("Error in signup:", err);
         } else {
-          res.json({ message: "User registered successfully" });
-          console.log("User registered succesfully");
+          console.log("User successfully registered");
+          res.json({ userId: result.insertId });
         }
       });
     }
@@ -44,19 +44,17 @@ const login = (req, res) => {
         res.status(401).json({ error: "Invalid email or password" });
       } else {
         const user = result[0];
-
         // Compare the provided password with the stored password hash
         bcrypt.compare(password, user.password, (err, isMatch) => {
           if (err) {
-            res.status(500).json({ error: err.message });
-            console.log("Error in login:", err);
+            res.status(500).json({ error: "Server Error" });
+          } else if (isMatch) {
+            // Passwords match, create and return a JWT token
+            const token = jwt.sign({ userId: user.id }, "your-secret-key");
+            console.log("User logged in:", user.username);
+            res.json({ token });
           } else {
-            if (isMatch) {
-              res.json({ message: "User logged in successfully" });
-              console.log("User logged in successfully");
-            } else {
-              res.status(401).json({ error: "Invalid email or password" });
-            }
+            res.status(401).json({ error: "Invalid email or password" });
           }
         });
       }
@@ -64,7 +62,15 @@ const login = (req, res) => {
   });
 };
 
+// User Logout
+const logout = (req, res) => {
+  // You can choose to implement additional logic here, such as token invalidation or blacklist
+  console.log("User logged out");
+  res.json({ message: "Logged out successfully" });
+};
+
 module.exports = {
   signup,
   login,
+  logout,
 };
