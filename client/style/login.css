@@ -48,3 +48,30 @@ button {
 button:hover {
   background-color: #45a049;
 }
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.signup-container {
+  display: flex;
+  align-items: center;
+}
+
+.signup-container p {
+  margin-right: 10px;
+}
+
+.signup-container button {
+  background-color: transparent;
+  color: #666;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.signup-container button:hover {
+  color: #333;
+}

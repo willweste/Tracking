@@ -26,8 +26,11 @@ loginForm.addEventListener("submit", async function (event) {
       // User login successful
       console.log("User logged in successfully");
 
-      // Redirect to a new page or perform other actions
-      // Example: Redirect to the dashboard page
+      // Store the JWT token in local storage
+      const data = await response.json();
+      localStorage.setItem("token", data.token);
+
+      // Redirect to the index page
       window.location.href = "index.html";
     } else {
       // User login failed

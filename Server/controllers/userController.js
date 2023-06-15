@@ -14,7 +14,7 @@ const signup = (req, res) => {
       console.log("Error in signup:", err);
     } else {
       const sqlInsert =
-        "INSERT INTO Users (username, email, password) VALUES (?, ?, ?)";
+          "INSERT INTO Users (username, email, password) VALUES (?, ?, ?)";
       db.query(sqlInsert, [username, email, hashedPassword], (err, result) => {
         if (err) {
           res.status(500).json({ error: err.message });
@@ -52,6 +52,7 @@ const login = (req, res) => {
             // Passwords match, create and return a JWT token
             const token = jwt.sign({ userId: user.id }, "your-secret-key");
             console.log("User logged in:", user.username);
+            console.log("User ID:", user.id); // Log the userId in the console
             res.json({ token });
           } else {
             res.status(401).json({ error: "Invalid email or password" });

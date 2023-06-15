@@ -8,41 +8,47 @@
     <link rel="stylesheet" href="../style/style.css" />
   </head>
   <body>
-    <div id="root"></div>
-    <div class="header">
-      <div class="header-right">
-        <button id="signupButton" onclick="location.href='signup.html'">
-          Sign Up
-        </button>
-        <button id="loginButton" onclick="location.href='login.html'">
-          Login
-        </button>
+
+  <div class="header-right">
+    <button id="logoutButton">Logout</button>
+  </div>
+
+
+      <div id="root"></div>
+      <div class="header">
+        <div class="header-right">
+          <button id="signupButton" onclick="location.href='signup.html'">
+            Sign Up
+          </button>
+          <button id="loginButton" onclick="location.href='login.html'">
+            Login
+          </button>
+        </div>
       </div>
-    </div>
-    <h1>Bug Tracking Form</h1>
+      <h1>Bug Tracking Form</h1>
 
-    <form id="bugForm">
-      <label for="title">Title:</label>
-      <input type="text" id="titleInput" required />
+      <form id="bugForm">
+        <label for="title">Title:</label>
+        <input type="text" id="titleInput" required />
 
-      <label for="description">Description:</label>
-      <textarea id="descriptionInput" required></textarea>
+        <label for="description">Description:</label>
+        <textarea id="descriptionInput" required></textarea>
 
-      <button type="submit">Submit</button>
-    </form>
+        <button type="submit">Submit</button>
+      </form>
 
-    <h2>Bugs</h2>
+      <h2>Bugs</h2>
 
-    <table id="bugTable">
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Description</th>
-          <th>ID</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-    <script src="../scripts/index.js"></script>
-  </body>
-</html>
+      <table id="bugTable">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>ID</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <script src="../scripts/index.js"></script>
+    </body>
+  </html>

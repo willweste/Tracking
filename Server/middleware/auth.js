@@ -9,7 +9,7 @@ const authenticateToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, "your-secret-key");
-    req.user = decoded;
+    req.user = decoded; // User information is stored in req.user
     next();
   } catch (error) {
     return res.status(403).json({ error: "Invalid token" });

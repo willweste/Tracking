@@ -15,8 +15,9 @@ const getAllBugs = (req, res) => {
 // Create a new bug in the database
 const createBug = (req, res) => {
   const { title, description } = req.body;
-  const sqlInsert = "INSERT INTO Bugs (title, description) VALUES (?, ?)";
-  db.query(sqlInsert, [title, description], (err, result) => {
+  const user_id = req.user.id; // Retrieve the user_id from the authenticated user
+  const sqlInsert = "INSERT INTO Bugs (title, description, user_id) VALUES (?, ?, ?)";
+  db.query(sqlInsert, [title, description, user_id], (err, result) => {
     if (err) {
       res.status(500).json({ error: err.message });
     } else {
@@ -24,6 +25,7 @@ const createBug = (req, res) => {
     }
   });
 };
+
 
 // Delete a bug from the database
 const deleteBug = (req, res) => {

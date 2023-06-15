@@ -1,6 +1,32 @@
 const bugForm = document.getElementById("bugForm");
 const submitButton = bugForm.querySelector('button[type="submit"]');
 
+// Add a check for authentication on page load
+window.addEventListener("load", () => {
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    // User is authenticated, show the logout button
+    document.getElementById("logoutButton").style.display = "block";
+  } else {
+    // User is not authenticated, hide the logout button and redirect to the login page
+    document.getElementById("logoutButton").style.display = "none";
+    window.location.href = "login.html";
+  }
+});
+
+// Add logout functionality
+const logoutButton = document.getElementById("logoutButton");
+logoutButton.addEventListener("click", () => {
+  // Clear the stored token
+  localStorage.removeItem("token");
+
+  // Redirect to the login page
+  window.location.href = "login.html";
+});
+
+// ... rest of the code ...
+
 bugForm.addEventListener("submit", function (event) {
   event.preventDefault();
 
@@ -16,28 +42,31 @@ bugForm.addEventListener("submit", function (event) {
     description: descriptionInput.value,
   };
 
+  const token = localStorage.getItem("token");
+
   fetch("http://localhost:5000/api/bugs/create", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`, // Include the authentication token in the headers
     },
     body: JSON.stringify(bug),
   })
-    .then((response) => response.json())
-    .then((data) => {
-      // Assuming the response contains the newly created bug ID
-      console.log("Bug created with ID:", data.bugId);
+      .then((response) => response.json())
+      .then((data) => {
+        // Assuming the response contains the newly created bug ID
+        console.log("Bug created with ID:", data.bugId);
 
-      // Display the new bug in the table
-      displayBug(data.bugId, bug.title, bug.description);
-    })
-    .catch((error) => {
-      console.log("Error creating bug:", error);
-    })
-    .finally(() => {
-      // Re-enable the submit button
-      submitButton.disabled = false;
-    });
+        // Display the new bug in the table
+        displayBug(data.bugId, bug.title, bug.description);
+      })
+      .catch((error) => {
+        console.log("Error creating bug:", error);
+      })
+      .finally(() => {
+        // Re-enable the submit button
+        submitButton.disabled = false;
+      });
 
   // Clear form inputs
   titleInput.value = "";
@@ -46,16 +75,16 @@ bugForm.addEventListener("submit", function (event) {
 
 // Fetch bugs data from the backend API
 fetch("http://localhost:5000/api/bugs")
-  .then((response) => response.json())
-  .then((data) => {
-    // Loop through the bugs data and generate table rows
-    data.forEach((bug) => {
-      displayBug(bug.id, bug.title, bug.description);
+    .then((response) => response.json())
+    .then((data) => {
+      // Loop through the bugs data and generate table rows
+      data.forEach((bug) => {
+        displayBug(bug.id, bug.title, bug.description);
+      });
+    })
+    .catch((error) => {
+      console.log("Error retrieving bugs:", error);
     });
-  })
-  .catch((error) => {
-    console.log("Error retrieving bugs:", error);
-  });
 
 const tableBody = document.querySelector("#bugTable tbody");
 
@@ -82,19 +111,19 @@ function deleteBug(bugId) {
   fetch(`http://localhost:5000/api/bugs/${bugId}`, {
     method: "DELETE",
   })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log("Bug deleted with ID:", data.bugId);
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Bug deleted with ID:", data.bugId);
 
-      // Remove the corresponding row from the table
-      const rowToDelete = document.querySelector(
-        `#bugTable tr[data-bug-id="${data.bugId}"]`
-      );
-      if (rowToDelete) {
-        rowToDelete.remove();
-      }
-    })
-    .catch((error) => {
-      console.log("Error deleting bug:", error);
-    });
+        // Remove the corresponding row from the table
+        const rowToDelete = document.querySelector(
+            `#bugTable tr[data-bug-id="${data.bugId}"]`
+        );
+        if (rowToDelete) {
+          rowToDelete.remove();
+        }
+      })
+      .catch((error) => {
+        console.log("Error deleting bug:", error);
+      });
 }
