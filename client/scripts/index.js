@@ -15,15 +15,19 @@ window.addEventListener("load", () => {
   }
 });
 
+
 // Add logout functionality
 const logoutButton = document.getElementById("logoutButton");
 logoutButton.addEventListener("click", () => {
-  // Clear the stored token
-  localStorage.removeItem("token");
+    // Clear the stored token
+    const token = localStorage.getItem("token");
+    localStorage.removeItem("token");
+    console.log("JWT Token deleted:", token); // Log the JWT token
 
-  // Redirect to the login page
-  window.location.href = "login.html";
+    // Redirect to the signup page
+    window.location.href = "signup.html";
 });
+
 
 // ... rest of the code ...
 
@@ -59,6 +63,8 @@ bugForm.addEventListener("submit", function (event) {
 
         // Display the new bug in the table
         displayBug(data.bugId, bug.title, bug.description);
+          console.log("JWT Token:", token); // Log the JWT token
+          console.log("User ID:", getUserIdFromToken(token)); // Log the user ID (assuming you have a function to extract the user ID from the token)
       })
       .catch((error) => {
         console.log("Error creating bug:", error);
@@ -77,7 +83,10 @@ bugForm.addEventListener("submit", function (event) {
 fetch("http://localhost:5000/api/bugs")
     .then((response) => response.json())
     .then((data) => {
-      // Loop through the bugs data and generate table rows
+        console.log("JWT Token:", req.headers.authorization); // Log the JWT token
+        console.log("User ID:", req.user.id); // Log the user ID
+
+        // Loop through the bugs data and generate table rows
       data.forEach((bug) => {
         displayBug(bug.id, bug.title, bug.description);
       });
@@ -127,3 +136,13 @@ function deleteBug(bugId) {
         console.log("Error deleting bug:", error);
       });
 }
+
+const getUserIdFromToken = (token) => {
+    // Decode the token to get the payload
+    const decodedToken = jwt.decode(token);
+
+    // Extract the user ID from the payload
+    const userId = decodedToken.userId;
+
+    return userId;
+};

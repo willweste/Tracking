@@ -4,28 +4,28 @@ const db = require("../db");
 
 module.exports = function (passport) {
   passport.use(
-    new LocalStrategy({ usernameField: "email" }, (email, password, done) => {
-      const sqlSelect = "SELECT * FROM Users WHERE email = ?";
-      db.query(sqlSelect, [email], async (err, result) => {
-        if (err) {
-          return done(err);
-        }
-        if (result.length === 0) {
-          return done(null, false, { message: "Invalid email or password" });
-        }
-        const user = result[0];
-        try {
-          const passwordMatch = await bcrypt.compare(password, user.password);
-          if (passwordMatch) {
-            return done(null, user);
-          } else {
+      new LocalStrategy({ usernameField: "email" }, (email, password, done) => {
+        const sqlSelect = "SELECT * FROM Users WHERE email = ?";
+        db.query(sqlSelect, [email], async (err, result) => {
+          if (err) {
+            return done(err);
+          }
+          if (result.length === 0) {
             return done(null, false, { message: "Invalid email or password" });
           }
-        } catch (error) {
-          return done(error);
-        }
-      });
-    })
+          const user = result[0];
+          try {
+            const passwordMatch = await bcrypt.compare(password, user.password);
+            if (passwordMatch) {
+              return done(null, user);
+            } else {
+              return done(null, false, { message: "Invalid email or password" });
+            }
+          } catch (error) {
+            return done(error);
+          }
+        });
+      })
   );
 
   passport.serializeUser((user, done) => {

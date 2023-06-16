@@ -42,6 +42,7 @@ const login = (req, res) => {
     } else {
       if (result.length === 0) {
         res.status(401).json({ error: "Invalid email or password" });
+        console.log("Wrong password");
       } else {
         const user = result[0];
         // Compare the provided password with the stored password hash
@@ -53,7 +54,8 @@ const login = (req, res) => {
             const token = jwt.sign({ userId: user.id }, "your-secret-key");
             console.log("User logged in:", user.username);
             console.log("User ID:", user.id); // Log the userId in the console
-            res.json({ token });
+            console.log("Token:", token); // Log the token in the console
+            res.json({ token, userId: user.id }); // Include userId in the response JSON
           } else {
             res.status(401).json({ error: "Invalid email or password" });
           }
