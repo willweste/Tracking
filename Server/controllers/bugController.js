@@ -1,5 +1,7 @@
 const db = require("../db");
 
+//Errors below not working with frontend
+
 // Fetch all bugs from the database
 const getAllBugs = (req, res) => {
   const user_id = req.user.id; // Retrieve the user_id from the authenticated user
