@@ -1,9 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const session = require("express-session");
-const passport = require("passport");
+const passport = require("passport"); // Add this line to import passport
 const routes = require("./routes/routes");
-const passportConfig = require("../Server/middleware/passportConfig"); // Import the passport configuration
+const passportConfig = require("./middleware/passportConfig"); // Update the import path
 
 const app = express();
 

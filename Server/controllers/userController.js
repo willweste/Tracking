@@ -1,5 +1,5 @@
 const db = require("../db");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 // User Registration
@@ -8,22 +8,17 @@ const signup = (req, res) => {
 
   // TODO: Implement validation for username, email, and password
 
-  bcrypt.hash(password, 10, (err, hashedPassword) => {
+  const hashedPassword = bcrypt.hashSync(password, 10);
+
+  const sqlInsert =
+      "INSERT INTO Users (username, email, password) VALUES (?, ?, ?)";
+  db.query(sqlInsert, [username, email, hashedPassword], (err, result) => {
     if (err) {
-      res.status(500).json({ error: "Server Error" });
+      res.status(500).json({ error: err.message });
       console.log("Error in signup:", err);
     } else {
-      const sqlInsert =
-          "INSERT INTO Users (username, email, password) VALUES (?, ?, ?)";
-      db.query(sqlInsert, [username, email, hashedPassword], (err, result) => {
-        if (err) {
-          res.status(500).json({ error: err.message });
-          console.log("Error in signup:", err);
-        } else {
-          console.log("User successfully registered");
-          res.json({ userId: result.insertId });
-        }
-      });
+      console.log("User successfully registered");
+      res.json({ userId: result.insertId });
     }
   });
 };
@@ -45,21 +40,16 @@ const login = (req, res) => {
         console.log("Wrong password");
       } else {
         const user = result[0];
-        // Compare the provided password with the stored password hash
-        bcrypt.compare(password, user.password, (err, isMatch) => {
-          if (err) {
-            res.status(500).json({ error: "Server Error" });
-          } else if (isMatch) {
-            // Passwords match, create and return a JWT token
-            const token = jwt.sign({ userId: user.id }, "your-secret-key");
-            console.log("User logged in:", user.username);
-            console.log("User ID:", user.id); // Log the userId in the console
-            console.log("Token:", token); // Log the token in the console
-            res.json({ token, userId: user.id }); // Include userId in the response JSON
-          } else {
-            res.status(401).json({ error: "Invalid email or password" });
-          }
-        });
+        const passwordMatch = bcrypt.compareSync(password, user.password);
+        if (passwordMatch) {
+          const token = jwt.sign({ userId: user.id }, "your-secret-key");
+          console.log("User logged in:", user.username);
+          console.log("User ID:", user.id); // Log the userId in the console
+          console.log("Token:", token); // Log the token in the console
+          res.json({ token, userId: user.id }); // Include userId in the response JSON
+        } else {
+          res.status(401).json({ error: "Invalid email or password" });
+        }
       }
     }
   });

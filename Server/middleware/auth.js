@@ -12,7 +12,7 @@ const authenticateToken = (req, res, next) => {
     req.user = decoded; // User information is stored in req.user
     next();
   } catch (error) {
-    if (error instanceof jwt.TokenExpiredError) { // Fix the condition here
+    if (error.name === "TokenExpiredError") {
       return res.status(401).json({ error: "Token expired" });
     }
     return res.status(403).json({ error: "Invalid token" });
