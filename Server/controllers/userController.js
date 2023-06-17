@@ -42,7 +42,10 @@ const login = (req, res) => {
         const user = result[0];
         const passwordMatch = bcrypt.compareSync(password, user.password);
         if (passwordMatch) {
-          const token = jwt.sign({ userId: user.id }, "your-secret-key");
+          const token = jwt.sign(
+              { user_id: user.id },
+              "AA3A969BD5424527F2293749123BDE82127818186F07ECA6908C29AFF5F38106"
+          );
           console.log("User logged in:", user.username);
           console.log("User ID:", user.id); // Log the userId in the console
           console.log("Token:", token); // Log the token in the console

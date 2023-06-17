@@ -3,9 +3,14 @@ const submitButton = bugForm.querySelector('button[type="submit"]');
 const tableBody = document.querySelector("#bugTable tbody");
 const logoutButton = document.getElementById("logoutButton");
 
+// Function to get the token from localStorage
+function getToken() {
+    return localStorage.getItem("token");
+}
+
 // Add a check for authentication on page load
 window.addEventListener("load", () => {
-    const token = localStorage.getItem("token");
+    const token = getToken();
 
     if (token) {
         // User is authenticated, show the logout button
@@ -20,7 +25,7 @@ window.addEventListener("load", () => {
 // Add logout functionality
 logoutButton.addEventListener("click", () => {
     // Clear the stored token
-    const token = localStorage.getItem("token");
+    const token = getToken();
     localStorage.removeItem("token");
     console.log("JWT Token deleted:", token); // Log the JWT token
 
@@ -36,14 +41,18 @@ bugForm.addEventListener("submit", function (event) {
 
     const titleInput = document.getElementById("titleInput");
     const descriptionInput = document.getElementById("descriptionInput");
+    const token = getToken();
+
+    // Retrieve the user ID from the token payload
+    const decodedToken = decodeToken(token);
+    const user_id = decodedToken.user_id;
 
     // Create JavaScript object using input values
     const bug = {
         title: titleInput.value,
         description: descriptionInput.value,
+        user_id: user_id,
     };
-
-    const token = localStorage.getItem("token");
 
     fetch("http://localhost:5000/api/bugs/create", {
         method: "POST",
@@ -61,7 +70,7 @@ bugForm.addEventListener("submit", function (event) {
             // Display the new bug in the table
             displayBug(data.bugId, bug.title, bug.description);
             console.log("JWT Token:", token); // Log the JWT token
-            console.log("User ID:", getUserIdFromToken(token)); // Log the user ID (assuming you have a function to extract the user ID from the token)
+            console.log("User ID:", user_id); // Log the user ID (assuming you have a function to extract the user ID from the token)
         })
         .catch((error) => {
             console.log("Error creating bug:", error);
@@ -76,68 +85,26 @@ bugForm.addEventListener("submit", function (event) {
     descriptionInput.value = "";
 });
 
-// Fetch bugs data from the backend API
-fetch("http://localhost:5000/api/bugs")
-    .then((response) => response.json())
-    .then((data) => {
-        console.log("JWT Token:", localStorage.getItem("token")); // Log the JWT token
-        console.log("User ID:", getUserIdFromToken(localStorage.getItem("token"))); // Log the user ID
-
-        // Loop through the bugs data and generate table rows
-        data.forEach((bug) => {
-            displayBug(bug.id, bug.title, bug.description);
-        });
-    })
-    .catch((error) => {
-        console.log("Error retrieving bugs:", error);
-    });
-
 function displayBug(id, title, description) {
     const newRow = document.createElement("tr");
     newRow.innerHTML = `
     <td>${title}</td>
     <td>${description}</td>
-    <td>${id}</td>
-    <td><button class="delete-button" data-bug-id="${id}">Delete</button></td>
   `;
-    newRow.setAttribute("data-bug-id", id); // Assign a unique identifier
     tableBody.appendChild(newRow);
 }
 
-tableBody.addEventListener("click", function (event) {
-    if (event.target.classList.contains("delete-button")) {
-        const bugId = event.target.dataset.bugId;
-        deleteBug(bugId);
-    }
-});
-
-function deleteBug(bugId) {
-    fetch(`http://localhost:5000/api/bugs/${bugId}`, {
-        method: "DELETE",
-    })
-        .then((response) => response.json())
-        .then((data) => {
-            console.log("Bug deleted with ID:", data.bugId);
-
-            // Remove the corresponding row from the table
-            const rowToDelete = document.querySelector(
-                `#bugTable tr[data-bug-id="${data.bugId}"]`
-            );
-            if (rowToDelete) {
-                rowToDelete.remove();
-            }
-        })
-        .catch((error) => {
-            console.log("Error deleting bug:", error);
-        });
+// Function to decode the JWT token and extract the payload
+function decodeToken(token) {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+        atob(base64)
+            .split("")
+            .map(function (c) {
+                return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+            })
+            .join("")
+    );
+    return JSON.parse(jsonPayload);
 }
-
-const getUserIdFromToken = (token) => {
-    // Decode the token to get the payload
-    const decodedToken = jwt.decode(token);
-
-    // Extract the user ID from the payload
-    const userId = decodedToken.userId;
-
-    return userId;
-};
