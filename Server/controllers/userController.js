@@ -25,7 +25,6 @@ const signup = (req, res) => {
   });
 };
 
-// User Login
 const login = (req, res) => {
   const { email, password } = req.body;
 
@@ -51,7 +50,7 @@ const login = (req, res) => {
           console.log("User logged in:", user.username);
           console.log("User ID:", user.id); // Log the userId in the console
           console.log("Token:", token); // Log the token in the console
-          res.json({ token, userId: user.id }); // Include userId in the response JSON
+          res.json({ token, userId: user.id, username: user.username }); // Include username in the response JSON
         } else {
           res.status(401).json({ error: "Invalid email or password" });
         }
@@ -60,6 +59,7 @@ const login = (req, res) => {
   });
 };
 
+
 // User Logout
 const logout = (req, res) => {
   // You can choose to implement additional logic here, such as token invalidation or blacklist
@@ -67,8 +67,30 @@ const logout = (req, res) => {
   res.json({ message: "Logged out successfully" });
 };
 
+// Fetch logged-in user data
+const getLoggedInUser = (req, res) => {
+  const userId = req.user.user_id; // Assuming the user_id is stored in req.user.user_id
+
+  const sqlSelect = "SELECT * FROM Users WHERE id = ?";
+  db.query(sqlSelect, [userId], (err, result) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      console.log("Error retrieving user data:", err);
+    } else {
+      if (result.length === 0) {
+        res.status(404).json({ error: "User not found" });
+      } else {
+        const user = result[0];
+        res.json({ username: user.username });
+      }
+    }
+  });
+};
+
+
 module.exports = {
   signup,
   login,
   logout,
+  getLoggedInUser,
 };

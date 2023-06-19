@@ -5,7 +5,9 @@ const logoutButton = document.getElementById("logoutButton");
 
 // Function to get the token from localStorage
 function getToken() {
-    return localStorage.getItem("token");
+    const token = localStorage.getItem("token");
+    console.log("Token:", token);
+    return token;
 }
 
 // Add a check for authentication on page load
@@ -15,10 +17,26 @@ window.addEventListener("load", () => {
     if (token) {
         // User is authenticated, show the logout button
         logoutButton.style.display = "block";
+
+        // Fetch user data
+        fetch("http://localhost:5000/api/users/me", {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`, // Include the authentication token in the headers
+            },
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                const { username } = data;
+                console.log("Logged-in username:", username);
+            })
+            .catch((error) => {
+                console.log("Error retrieving user data:", error);
+            });
     } else {
         // User is not authenticated, hide the logout button and redirect to the login page
         logoutButton.style.display = "none";
-        window.location.href = "login.html";
+        window.location.href = "signup.html";
     }
 });
 
@@ -28,7 +46,6 @@ logoutButton.addEventListener("click", () => {
     const token = getToken();
     localStorage.removeItem("token");
     console.log("JWT Token deleted:", token); // Log the JWT token
-
     // Redirect to the signup page
     window.location.href = "signup.html";
 });
