@@ -33,6 +33,10 @@ logoutButton.addEventListener("click", () => {
     window.location.href = "signup.html";
 });
 
+// Create bug functionality
+// ...
+
+// Create bug functionality
 bugForm.addEventListener("submit", function (event) {
     event.preventDefault();
 
@@ -43,15 +47,10 @@ bugForm.addEventListener("submit", function (event) {
     const descriptionInput = document.getElementById("descriptionInput");
     const token = getToken();
 
-    // Retrieve the user ID from the token payload
-    const decodedToken = decodeToken(token);
-    const user_id = decodedToken.user_id;
-
     // Create JavaScript object using input values
     const bug = {
         title: titleInput.value,
         description: descriptionInput.value,
-        user_id: user_id,
     };
 
     fetch("http://localhost:5000/api/bugs/create", {
@@ -66,11 +65,10 @@ bugForm.addEventListener("submit", function (event) {
         .then((data) => {
             // Assuming the response contains the newly created bug ID
             console.log("Bug created with ID:", data.bugId);
+            console.log("JWT Token:", token); // Log the JWT token
 
             // Display the new bug in the table
             displayBug(data.bugId, bug.title, bug.description);
-            console.log("JWT Token:", token); // Log the JWT token
-            console.log("User ID:", user_id); // Log the user ID (assuming you have a function to extract the user ID from the token)
         })
         .catch((error) => {
             console.log("Error creating bug:", error);
@@ -85,26 +83,76 @@ bugForm.addEventListener("submit", function (event) {
     descriptionInput.value = "";
 });
 
+// ...
+
+
+
+// Fetch bugs data from the backend API
+const token = getToken();
+
+fetch("http://localhost:5000/api/bugs", {
+    method: "GET",
+    headers: {
+        Authorization: `Bearer ${token}`, // Include the authentication token in the headers
+    },
+})
+    .then((response) => response.json())
+    .then((data) => {
+        // Loop through the bugs data and generate table rows
+        data.forEach((bug) => {
+            displayBug(bug.id, bug.title, bug.description);
+        });
+    })
+    .catch((error) => {
+        console.log("Error retrieving bugs:", error);
+    });
+
+
 function displayBug(id, title, description) {
     const newRow = document.createElement("tr");
     newRow.innerHTML = `
     <td>${title}</td>
     <td>${description}</td>
+    <td>${id}</td>
+    <td><button class="delete-button" data-bug-id="${id}">Delete</button></td>
   `;
+    newRow.setAttribute("data-bug-id", id); // Assign a unique identifier
     tableBody.appendChild(newRow);
 }
 
-// Function to decode the JWT token and extract the payload
-function decodeToken(token) {
-    const base64Url = token.split(".")[1];
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-    const jsonPayload = decodeURIComponent(
-        atob(base64)
-            .split("")
-            .map(function (c) {
-                return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-            })
-            .join("")
-    );
-    return JSON.parse(jsonPayload);
+
+tableBody.addEventListener("click", function (event) {
+    if (event.target.classList.contains("delete-button")) {
+        const bugId = event.target.dataset.bugId;
+        deleteBug(bugId);
+    }
+});
+
+function deleteBug(bugId) {
+    const token = getToken();
+
+    fetch(`http://localhost:5000/api/bugs/${bugId}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Include the authentication token in the headers
+        },
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            console.log("Bug deleted with ID:", data.bugId);
+            removeBugFromTable(data.bugId);
+        })
+        .catch((error) => {
+            console.log("Error deleting bug:", error);
+        });
 }
+
+function removeBugFromTable(bugId) {
+    const rowToRemove = tableBody.querySelector(`[data-bug-id="${bugId}"]`);
+    if (rowToRemove) {
+        rowToRemove.remove();
+    }
+}
+
+

@@ -1,9 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const session = require("express-session");
-const passport = require("passport"); // Add this line to import passport
 const routes = require("./routes/routes");
-const passportConfig = require("./middleware/passportConfig"); // Update the import path
+require('dotenv').config();
+
 
 const app = express();
 
@@ -12,7 +12,7 @@ app.use(express.json());
 
 app.use(
     session({
-        secret: "AA3A969BD5424527F2293749123BDE82127818186F07ECA6908C29AFF5F38106",
+        secret: process.env.ACCESS_TOKEN_SECRET,
         resave: false,
         saveUninitialized: false,
         cookie: {
@@ -20,11 +20,6 @@ app.use(
         },
     })
 );
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-passportConfig(passport); // Initialize passport with the configuration
 
 const port = 5000;
 app.listen(port, () => {

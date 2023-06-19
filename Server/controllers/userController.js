@@ -1,6 +1,8 @@
 const db = require("../db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+require('dotenv').config();
+
 
 // User Registration
 const signup = (req, res) => {
@@ -44,7 +46,7 @@ const login = (req, res) => {
         if (passwordMatch) {
           const token = jwt.sign(
               { user_id: user.id },
-              "AA3A969BD5424527F2293749123BDE82127818186F07ECA6908C29AFF5F38106"
+              process.env.ACCESS_TOKEN_SECRET
           );
           console.log("User logged in:", user.username);
           console.log("User ID:", user.id); // Log the userId in the console
