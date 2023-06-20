@@ -58,11 +58,13 @@ form button:hover {
 }
 
 .header-right {
-  margin-left: auto;
+  display: flex;
+  align-items: center; /* Align items vertically */
 }
 
-.header-right button {
-  margin-left: 10px;
+.header-right button,
+.header-right a {
+  margin-right: 10px; /* Adjust margin to create space between buttons */
   padding: 6px 10px; /* Updated padding values */
   background-color: #4caf50;
   color: #fff;
@@ -70,6 +72,29 @@ form button:hover {
   cursor: pointer;
 }
 
-.header-right button:hover {
+.header-right button:hover,
+.header-right a:hover {
   background-color: #45a049;
 }
+
+.header-right #username {
+  color: #4caf50; /* Set color for the username */
+  font-weight: bold; /* Add font weight for emphasis */
+  margin-right: 10px; /* Adjust margin to create space between the username and logout button */
+}
+
+#signupButton,
+#loginButton {
+  display: block; /* Hide the signup and login buttons by default */
+}
+
+#logoutButton,
+#username {
+  display: none; /* Hide the logout button and username by default */
+}
+
+
+/* ... */
+
+
+/* ... */

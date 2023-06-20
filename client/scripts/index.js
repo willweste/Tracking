@@ -2,6 +2,9 @@ const bugForm = document.getElementById("bugForm");
 const submitButton = bugForm.querySelector('button[type="submit"]');
 const tableBody = document.querySelector("#bugTable tbody");
 const logoutButton = document.getElementById("logoutButton");
+const usernameElement = document.getElementById("username")
+const signupButton = document.getElementById("signupButton");
+const loginButton = document.getElementById("loginButton");
 
 // Function to get the token from localStorage
 function getToken() {
@@ -15,8 +18,11 @@ window.addEventListener("load", () => {
     const token = getToken();
 
     if (token) {
-        // User is authenticated, show the logout button
+        // User is authenticated, show the logout button and username
         logoutButton.style.display = "block";
+        usernameElement.style.display = "inline-block";
+        signupButton.style.display = "none";
+        loginButton.style.display = "none";
 
         // Fetch user data
         fetch("http://localhost:5000/api/users/me", {
@@ -29,16 +35,24 @@ window.addEventListener("load", () => {
             .then((data) => {
                 const { username } = data;
                 console.log("Logged-in username:", username);
+
+                // Update the username element in the HTML
+                const usernameElement = document.getElementById("username");
+                usernameElement.textContent = `Username: ${username}`;
             })
             .catch((error) => {
                 console.log("Error retrieving user data:", error);
             });
     } else {
-        // User is not authenticated, hide the logout button and redirect to the login page
+        // User is not authenticated, hide the logout button and username
         logoutButton.style.display = "none";
+        usernameElement.style.display = "none";
+        signupButton.style.display = "block";
+        loginButton.style.display = "block";
         window.location.href = "signup.html";
     }
 });
+
 
 // Add logout functionality
 logoutButton.addEventListener("click", () => {
