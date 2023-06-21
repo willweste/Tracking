@@ -2,8 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const session = require("express-session");
 const routes = require("./routes/routes");
-require('dotenv').config();
-
+const authorizationServer = require("./middleware/authorizationServer"); // Import the authorization server
+require("dotenv").config();
 
 const app = express();
 
@@ -27,3 +27,8 @@ app.listen(port, () => {
 });
 
 app.use("/api", routes);
+
+const authorizationPort = 5001; // Set the port for the authorization server
+authorizationServer.listen(authorizationPort, () => {
+    console.log(`Authorization server is running on port ${authorizationPort}`);
+});
