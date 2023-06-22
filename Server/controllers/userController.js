@@ -1,8 +1,9 @@
+// userController.js
+
 const db = require("../db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-require('dotenv').config();
-
+require("dotenv").config();
 
 // User Registration
 const signup = (req, res) => {
@@ -25,6 +26,7 @@ const signup = (req, res) => {
   });
 };
 
+// User Login
 const login = (req, res) => {
   const { email, password } = req.body;
 
@@ -59,7 +61,6 @@ const login = (req, res) => {
   });
 };
 
-
 // User Logout
 const logout = (req, res) => {
   // You can choose to implement additional logic here, such as token invalidation or blacklist
@@ -86,7 +87,6 @@ const getLoggedInUser = (req, res) => {
     }
   });
 };
-
 
 module.exports = {
   signup,

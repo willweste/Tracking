@@ -1,3 +1,5 @@
+// authorizationServer.js
+
 const express = require("express");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
@@ -8,14 +10,14 @@ app.use(express.json());
 // Generate Access Token
 const generateAccessToken = (userId) => {
     return jwt.sign({ user_id: userId }, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "15m", // Set the access token expiry time (e.g., 15 minutes)
+        expiresIn: "1m", // Set the access token expiry time (e.g., 15 minutes)
     });
 };
 
 // Generate Refresh Token
-const generateRefreshToken = () => {
-    return jwt.sign({}, process.env.REFRESH_TOKEN_SECRET, {
-        expiresIn: "7d", // Set the refresh token expiry time (e.g., 7 days)
+const generateRefreshToken = (userId) => {
+    return jwt.sign({ user_id: userId }, process.env.REFRESH_TOKEN_SECRET, {
+        expiresIn: "5m", // Set the refresh token expiry time (e.g., 7 days)
     });
 };
 
@@ -34,10 +36,14 @@ app.post("/refresh", (req, res) => {
             return res.status(403).json({ error: "Invalid token" });
         }
 
-        // Generate a new access token
+        // Generate a new access token and send it in the response
         const accessToken = generateAccessToken(decoded.user_id);
         res.json({ accessToken });
     });
 });
 
-module.exports = app;
+module.exports = {
+    app,
+    generateAccessToken,
+    generateRefreshToken,
+};
