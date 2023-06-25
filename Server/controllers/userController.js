@@ -92,9 +92,28 @@ const getLoggedInUser = (req, res) => {
   });
 };
 
+// Refresh access token
+const refreshToken = (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ error: "Invalid refresh token" });
+    }
+
+    const accessToken = generateAccessToken(decoded.user_id);
+    res.json({ accessToken });
+  });
+};
+
 module.exports = {
   signup,
   login,
   logout,
   getLoggedInUser,
+  refreshToken,
 };

@@ -10,7 +10,7 @@ app.use(express.json());
 // Generate Access Token
 const generateAccessToken = (userId) => {
     return jwt.sign({ user_id: userId }, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "1m", // Set the access token expiry time (e.g., 15 minutes)
+        expiresIn: "15m", // Set the access token expiry time (e.g., 15 minutes)
     });
 };
 

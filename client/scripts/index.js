@@ -13,6 +13,16 @@ function getToken() {
     return token;
 }
 
+// Function to get the refresh token from cookies
+function getRefreshToken() {
+    const refreshToken = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("refreshToken="))
+        ?.split("=")[1];
+    console.log("Refresh Token:", refreshToken);
+    return refreshToken;
+}
+
 // Add a check for authentication on page load
 window.addEventListener("load", () => {
     const token = getToken();
@@ -60,6 +70,7 @@ function fetchUserData() {
                         headers: {
                             Authorization: `Bearer ${newAccessToken}`,
                         },
+                        credentials: "include", // Include cookies in the request
                     });
                 });
             } else {
@@ -75,12 +86,21 @@ function fetchUserData() {
         })
         .catch((error) => {
             console.log("Error retrieving user data:", error);
+            // Handle the error, e.g., redirect the user to the login page
+            window.location.href = "login.html";
         });
 }
 
+
 function refreshAccessToken() {
-    return fetch("http://localhost:5001/refresh", {
+    const refreshToken = getRefreshToken();
+
+    return fetch("http://localhost:5000/api/users/refresh-token", {
         method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refreshToken }),
         credentials: "include", // Include cookies in the request
     })
         .then((response) => {
@@ -108,10 +128,13 @@ function refreshAccessToken() {
 
 // Add logout functionality
 logoutButton.addEventListener("click", () => {
-    // Clear the stored token
+    // Clear the stored token and refresh token
     const token = getToken();
+    const refreshToken = getRefreshToken();
     localStorage.removeItem("token");
+    document.cookie = `refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
     console.log("JWT Token deleted:", token); // Log the JWT token
+    console.log("Refresh Token deleted:", refreshToken); // Log the refresh token
     // Redirect to the signup page
     window.location.href = "signup.html";
 });

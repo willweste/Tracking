@@ -17,4 +17,11 @@ router.get("/logout", userController.logout);
 // Fetch logged-in user data
 router.get("/me", authenticateToken, userController.getLoggedInUser);
 
+// ...
+
+// Refresh access token
+router.post("/refresh-token", userController.refreshToken);
+
+
+
 module.exports = router;
