@@ -1,17 +1,28 @@
-// app.js
-
-const express = require("express");
-const cors = require("cors");
-const session = require("express-session");
-const routes = require("./routes/routes");
-const authorizationServer = require("./middleware/authorizationServer"); // Import the authorization server
-require("dotenv").config();
+const express = require('express');
+const routes = require('./routes/routes');
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
+const session = require('express-session');
+require('dotenv').config();
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+// Set up CORS configuration
 
+
+app.use(express.json());
+// Set up CORS configuration
+const corsOptions = {
+    origin: (origin, callback) => {
+        callback(null, true);
+    },
+    credentials: true,
+};
+
+app.use(cors(corsOptions));
+
+app.use(express.json());
+app.use(cookieParser());
 app.use(
     session({
         secret: process.env.ACCESS_TOKEN_SECRET,
@@ -19,6 +30,7 @@ app.use(
         saveUninitialized: false,
         cookie: {
             secure: true, // Use secure cookies (requires HTTPS)
+            sameSite: 'none', // Allow cross-site cookies
         },
     })
 );
@@ -28,9 +40,4 @@ app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
 
-app.use("/api", routes);
-
-const authorizationPort = 5001; // Set the port for the authorization server
-authorizationServer.app.listen(authorizationPort, () => {
-    console.log(`Authorization server is running on port ${authorizationPort}`);
-});
+app.use('/api', routes);

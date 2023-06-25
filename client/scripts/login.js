@@ -20,6 +20,7 @@ loginForm.addEventListener("submit", async function (event) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(user),
+      credentials: "include", // Include cookies in the request
     });
 
     if (response.ok) {
@@ -28,10 +29,10 @@ loginForm.addEventListener("submit", async function (event) {
 
       // Store the JWT token in local storage
       const data = await response.json();
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("token", data.accessToken);
 
       // Redirect to the index page
-      window.location.href = "index.html";
+      //window.location.href = "index.html";
     } else {
       // User login failed
       throw new Error("Error logging in: " + response.status);

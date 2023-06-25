@@ -2,7 +2,7 @@ const bugForm = document.getElementById("bugForm");
 const submitButton = bugForm.querySelector('button[type="submit"]');
 const tableBody = document.querySelector("#bugTable tbody");
 const logoutButton = document.getElementById("logoutButton");
-const usernameElement = document.getElementById("username")
+const usernameElement = document.getElementById("username");
 const signupButton = document.getElementById("signupButton");
 const loginButton = document.getElementById("loginButton");
 
@@ -25,24 +25,7 @@ window.addEventListener("load", () => {
         loginButton.style.display = "none";
 
         // Fetch user data
-        fetch("http://localhost:5000/api/users/me", {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`, // Include the authentication token in the headers
-            },
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                const { username } = data;
-                console.log("Logged-in username:", username);
-
-                // Update the username element in the HTML
-                const usernameElement = document.getElementById("username");
-                usernameElement.textContent = `Username: ${username}`;
-            })
-            .catch((error) => {
-                console.log("Error retrieving user data:", error);
-            });
+        fetchUserData();
     } else {
         // User is not authenticated, hide the logout button and username
         logoutButton.style.display = "none";
@@ -53,6 +36,75 @@ window.addEventListener("load", () => {
     }
 });
 
+function fetchUserData() {
+    const accessToken = getToken();
+
+    fetch("http://localhost:5000/api/users/me", {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${accessToken}`, // Include the authentication token in the headers
+        },
+        credentials: "include", // Include cookies in the request
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            } else if (response.status === 401) {
+                console.log("Access token expired"); // Log when the access token has expired
+                // Access token expired, attempt token refreshing
+                return refreshAccessToken().then((newAccessToken) => {
+                    console.log("New access token generated:", newAccessToken); // Log the new access token
+                    // Retry the fetch request with the new access token
+                    return fetch("http://localhost:5000/api/users/me", {
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${newAccessToken}`,
+                        },
+                    });
+                });
+            } else {
+                throw new Error("Error retrieving user data");
+            }
+        })
+        .then((data) => {
+            const { username } = data;
+            console.log("Logged-in username:", username);
+
+            // Update the username element in the HTML
+            usernameElement.textContent = `Username: ${username}`;
+        })
+        .catch((error) => {
+            console.log("Error retrieving user data:", error);
+        });
+}
+
+function refreshAccessToken() {
+    return fetch("http://localhost:5001/refresh", {
+        method: "POST",
+        credentials: "include", // Include cookies in the request
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error("Error refreshing access token");
+            }
+        })
+        .then((data) => {
+            const { accessToken } = data;
+            console.log("Access token refreshed:", accessToken);
+
+            // Store the access token in the local storage
+            localStorage.setItem("token", accessToken);
+
+            return accessToken;
+        })
+        .catch((error) => {
+            console.log("Error refreshing access token:", error);
+            // Handle the error, e.g., redirect the user to the login page
+            window.location.href = "login.html";
+        });
+}
 
 // Add logout functionality
 logoutButton.addEventListener("click", () => {
@@ -63,9 +115,6 @@ logoutButton.addEventListener("click", () => {
     // Redirect to the signup page
     window.location.href = "signup.html";
 });
-
-// Create bug functionality
-// ...
 
 // Create bug functionality
 bugForm.addEventListener("submit", function (event) {
@@ -91,6 +140,7 @@ bugForm.addEventListener("submit", function (event) {
             Authorization: `Bearer ${token}`, // Include the authentication token in the headers
         },
         body: JSON.stringify(bug),
+        credentials: "include", // Include cookies in the request
     })
         .then((response) => response.json())
         .then((data) => {
@@ -114,10 +164,6 @@ bugForm.addEventListener("submit", function (event) {
     descriptionInput.value = "";
 });
 
-// ...
-
-
-
 // Fetch bugs data from the backend API
 const token = getToken();
 
@@ -126,6 +172,7 @@ fetch("http://localhost:5000/api/bugs", {
     headers: {
         Authorization: `Bearer ${token}`, // Include the authentication token in the headers
     },
+    credentials: "include", // Include cookies in the request
 })
     .then((response) => response.json())
     .then((data) => {
@@ -138,7 +185,6 @@ fetch("http://localhost:5000/api/bugs", {
         console.log("Error retrieving bugs:", error);
     });
 
-
 function displayBug(id, title, description) {
     const newRow = document.createElement("tr");
     newRow.innerHTML = `
@@ -150,7 +196,6 @@ function displayBug(id, title, description) {
     newRow.setAttribute("data-bug-id", id); // Assign a unique identifier
     tableBody.appendChild(newRow);
 }
-
 
 tableBody.addEventListener("click", function (event) {
     if (event.target.classList.contains("delete-button")) {
@@ -168,6 +213,7 @@ function deleteBug(bugId) {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`, // Include the authentication token in the headers
         },
+        credentials: "include", // Include cookies in the request
     })
         .then((response) => response.json())
         .then((data) => {
@@ -185,5 +231,3 @@ function removeBugFromTable(bugId) {
         rowToRemove.remove();
     }
 }
-
-

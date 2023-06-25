@@ -1,9 +1,8 @@
-// userController.js
-
 const db = require("../db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-require("dotenv").config();
+const { generateAccessToken, generateRefreshToken } = require("../middleware/authorizationServer");
+require('dotenv').config();
 
 // User Registration
 const signup = (req, res) => {
@@ -26,11 +25,8 @@ const signup = (req, res) => {
   });
 };
 
-// User Login
 const login = (req, res) => {
   const { email, password } = req.body;
-
-  // TODO: Implement validation for email and password
 
   const sqlSelect = "SELECT * FROM Users WHERE email = ?";
   db.query(sqlSelect, [email], (err, result) => {
@@ -45,14 +41,22 @@ const login = (req, res) => {
         const user = result[0];
         const passwordMatch = bcrypt.compareSync(password, user.password);
         if (passwordMatch) {
-          const token = jwt.sign(
-              { user_id: user.id },
-              process.env.ACCESS_TOKEN_SECRET
-          );
-          console.log("User logged in:", user.username);
-          console.log("User ID:", user.id); // Log the userId in the console
-          console.log("Token:", token); // Log the token in the console
-          res.json({ token, userId: user.id, username: user.username }); // Include username in the response JSON
+          const accessToken = generateAccessToken(user.id);
+          const refreshToken = generateRefreshToken(user.id);
+
+          res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none", // Allow the cookie to be sent for cross-site requests
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
+            path: "/",
+          });
+
+          res.json({
+            accessToken,
+            userId: user.id,
+            username: user.username,
+          });
         } else {
           res.status(401).json({ error: "Invalid email or password" });
         }
@@ -60,11 +64,11 @@ const login = (req, res) => {
     }
   });
 };
-
 // User Logout
 const logout = (req, res) => {
   // You can choose to implement additional logic here, such as token invalidation or blacklist
   console.log("User logged out");
+  res.clearCookie("refreshToken", { path: "/refresh" }); // Clear the refresh token cookie
   res.json({ message: "Logged out successfully" });
 };
 

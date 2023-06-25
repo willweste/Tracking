@@ -17,7 +17,7 @@ const generateAccessToken = (userId) => {
 // Generate Refresh Token
 const generateRefreshToken = (userId) => {
     return jwt.sign({ user_id: userId }, process.env.REFRESH_TOKEN_SECRET, {
-        expiresIn: "5m", // Set the refresh token expiry time (e.g., 7 days)
+        expiresIn: "7d", // Set the refresh token expiry time (e.g., 7 days)
     });
 };
 
@@ -36,7 +36,7 @@ app.post("/refresh", (req, res) => {
             return res.status(403).json({ error: "Invalid token" });
         }
 
-        // Generate a new access token and send it in the response
+        // Generate a new access token
         const accessToken = generateAccessToken(decoded.user_id);
         res.json({ accessToken });
     });
