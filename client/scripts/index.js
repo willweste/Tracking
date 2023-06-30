@@ -36,6 +36,7 @@ window.addEventListener("load", () => {
 
         // Fetch user data
         fetchUserData();
+        fetchAndDisplayBugs();
     } else {
         // User is not authenticated, hide the logout button and username
         logoutButton.style.display = "none";
@@ -148,12 +149,20 @@ bugForm.addEventListener("submit", function (event) {
 
     const titleInput = document.getElementById("titleInput");
     const descriptionInput = document.getElementById("descriptionInput");
+    const statusInput = document.getElementById("statusInput");
+    const severityInput = document.getElementById("severityInput");
+    const assignedToInput = document.getElementById("assignedToInput");
+    const reportedByInput = document.getElementById("reportedByInput");
     const token = getToken();
 
     // Create JavaScript object using input values
     const bug = {
         title: titleInput.value,
         description: descriptionInput.value,
+        status: statusInput.value,
+        severity: severityInput.value,
+        assignedTo: assignedToInput.value,
+        reportedBy: reportedByInput.value,
     };
 
     fetch("http://localhost:5000/api/bugs/create", {
@@ -171,8 +180,10 @@ bugForm.addEventListener("submit", function (event) {
             console.log("Bug created with ID:", data.bugId);
             console.log("JWT Token:", token); // Log the JWT token
 
+            fetchAndDisplayBugs();
+
             // Display the new bug in the table
-            displayBug(data.bugId, bug.title, bug.description);
+            displayBug(data.bugId, bug.title, bug.description, bug.status, bug.severity, bug.assignedTo, bug.reportedBy);
         })
         .catch((error) => {
             console.log("Error creating bug:", error);
@@ -185,11 +196,16 @@ bugForm.addEventListener("submit", function (event) {
     // Clear form inputs
     titleInput.value = "";
     descriptionInput.value = "";
+    statusInput.value = "Open";
+    severityInput.value = "Low";
+    assignedToInput.value = "";
+    reportedByInput.value = "";
 });
+
+
 
 // Fetch bugs data from the backend API
 const token = getToken();
-
 fetch("http://localhost:5000/api/bugs", {
     method: "GET",
     headers: {
@@ -201,24 +217,44 @@ fetch("http://localhost:5000/api/bugs", {
     .then((data) => {
         // Loop through the bugs data and generate table rows
         data.forEach((bug) => {
-            displayBug(bug.id, bug.title, bug.description);
+            displayBug(bug.id, bug.title, bug.description, bug.Status, bug.Severity, bug.AssignedTo, bug.ReportedBy, bug.CreatedAt, bug.UpdatedAt);
         });
     })
     .catch((error) => {
         console.log("Error retrieving bugs:", error);
     });
 
-function displayBug(id, title, description) {
+
+
+function displayBug(id, title, description, status, severity, assignedTo, reportedBy, createdAt, updatedAt) {
+    // Create Date objects from the timestamps
+    const createdAtDate = new Date(createdAt);
+    const updatedAtDate = new Date(updatedAt);
+
+    // Convert the Date objects to the EST time zone
+    const createdAtEST = createdAtDate.toLocaleString("en-US", { timeZone: "America/New_York" });
+    const updatedAtEST = updatedAtDate.toLocaleString("en-US", { timeZone: "America/New_York" });
+
     const newRow = document.createElement("tr");
     newRow.innerHTML = `
     <td>${title}</td>
     <td>${description}</td>
+    <td>${status}</td>
+    <td>${severity}</td>
+    <td>${assignedTo}</td>
+    <td>${reportedBy}</td>
+    <td>${createdAtEST}</td>
+    <td>${updatedAtEST}</td>
     <td>${id}</td>
     <td><button class="delete-button" data-bug-id="${id}">Delete</button></td>
   `;
     newRow.setAttribute("data-bug-id", id); // Assign a unique identifier
     tableBody.appendChild(newRow);
 }
+
+
+
+
 
 tableBody.addEventListener("click", function (event) {
     if (event.target.classList.contains("delete-button")) {
@@ -242,6 +278,7 @@ function deleteBug(bugId) {
         .then((data) => {
             console.log("Bug deleted with ID:", data.bugId);
             removeBugFromTable(data.bugId);
+            fetchAndDisplayBugs();
         })
         .catch((error) => {
             console.log("Error deleting bug:", error);
@@ -253,4 +290,27 @@ function removeBugFromTable(bugId) {
     if (rowToRemove) {
         rowToRemove.remove();
     }
+}
+
+function fetchAndDisplayBugs() {
+    const token = getToken();
+    fetch("http://localhost:5000/api/bugs", {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${token}`, // Include the authentication token in the headers
+        },
+        credentials: "include", // Include cookies in the request
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            // Loop through the bugs data and generate table rows
+            // But before that, clear the existing table data
+            tableBody.innerHTML = "";
+            data.forEach((bug) => {
+                displayBug(bug.id, bug.title, bug.description, bug.Status, bug.Severity, bug.AssignedTo, bug.ReportedBy, bug.CreatedAt, bug.UpdatedAt);
+            });
+        })
+        .catch((error) => {
+            console.log("Error retrieving bugs:", error);
+        });
 }

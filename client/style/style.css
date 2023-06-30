@@ -32,10 +32,14 @@ form label {
 }
 
 form input,
+form select,
 form textarea {
   width: 100%;
   padding: 8px;
   margin-bottom: 10px;
+  box-sizing: border-box;  /* New rule to include padding in total width */
+  border: 1px solid #ccc;  /* New rule to add a border */
+  border-radius: 4px;  /* New rule to round the corners */
 }
 
 form button {
@@ -93,6 +97,16 @@ form button:hover {
   display: none; /* Hide the logout button and username by default */
 }
 
+
+form select {
+  background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  appearance: none; /* Remove default select dropdown arrow */
+  -webkit-appearance: none; /* Remove default select dropdown arrow for Safari */
+  -moz-appearance: none; /* Remove default select dropdown arrow for Firefox */
+  padding-right: 24px; /* Add padding so text doesn't overlay the dropdown arrow */
+}
 
 /* ... */
 
