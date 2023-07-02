@@ -47,6 +47,7 @@ window.addEventListener("load", () => {
     }
 });
 
+let loggedInUsername = '';
 function fetchUserData() {
     const accessToken = getToken();
 
@@ -81,7 +82,9 @@ function fetchUserData() {
         .then((data) => {
             const { username } = data;
             console.log("Logged-in username:", username);
-
+            const reportedByInput = document.getElementById("reportedByInput");
+            reportedByInput.value = username;
+            loggedInUsername = username;
             // Update the username element in the HTML
             usernameElement.textContent = `Username: ${username}`;
         })
@@ -199,7 +202,7 @@ bugForm.addEventListener("submit", function (event) {
     statusInput.value = "Open";
     severityInput.value = "Low";
     assignedToInput.value = "";
-    reportedByInput.value = "";
+    reportedByInput.value = loggedInUsername;
 });
 
 
