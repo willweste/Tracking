@@ -15,8 +15,14 @@
         <label for="password">Password:</label>
         <input type="password" id="passwordInput" name="password" required />
       </div>
-      <div>
+      <div class="button-container">
         <button type="submit">Log In</button>
+        <div class="signup-container">
+          <p id="text">Don't have an account?</p>
+          <button id="signupButton" onclick="location.href='signup.html'">
+            Signup
+          </button>
+        </div>
       </div>
     </form>
     <script src="../scripts/login.js"></script>

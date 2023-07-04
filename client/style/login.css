@@ -64,14 +64,16 @@ button:hover {
 }
 
 .signup-container button {
-  background-color: transparent;
-  color: #666;
-  border: none;
+  background-color: #f2f2f2; /* Light grey */
+  color: #4caf50; /* Green text */
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #4caf50; /* Green border */
   cursor: pointer;
-  text-decoration: underline;
-  padding: 0;
 }
 
 .signup-container button:hover {
-  color: #333;
+  background-color: #4caf50; /* Green background on hover */
+  color: #fff; /* White text on hover */
 }
