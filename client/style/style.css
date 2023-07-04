@@ -108,7 +108,7 @@ form select {
   padding-right: 24px; /* Add padding so text doesn't overlay the dropdown arrow */
 }
 
-/* ... */
-
-
-/* ... */
+.page-link.active {
+  background-color: #4caf50;
+  color: #fff;
+}

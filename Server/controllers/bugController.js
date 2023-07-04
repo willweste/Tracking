@@ -23,19 +23,35 @@ const createBug = (req, res) => {
 // Fetch all bugs from the database
 const getAllBugs = (req, res) => {
   const user_id = req.user.user_id; // Retrieve the user_id from the authenticated user
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = 10; // Specify the desired page size
 
   console.log("User ID:", user_id); // Log the user ID
 
   const sqlSelect =
-      "SELECT id, title, description, Status, Severity, AssignedTo, ReportedBy, CreatedAt, UpdatedAt FROM Bugs WHERE user_id = ?";
-  db.query(sqlSelect, [user_id], (err, result) => {
+      "SELECT id, title, description, Status, Severity, AssignedTo, ReportedBy, CreatedAt, UpdatedAt FROM Bugs WHERE user_id = ? LIMIT ? OFFSET ?";
+  const sqlCount = "SELECT COUNT(*) AS totalCount FROM Bugs WHERE user_id = ?";
+
+  db.query(sqlCount, [user_id], (err, countResult) => {
     if (err) {
       res.status(500).json({ error: err.message });
     } else {
-      res.json(result);
+      const totalCount = countResult[0].totalCount;
+      const totalPages = Math.ceil(totalCount / pageSize);
+      const offset = (page - 1) * pageSize;
+
+      db.query(sqlSelect, [user_id, pageSize, offset], (err, result) => {
+        if (err) {
+          res.status(500).json({ error: err.message });
+        } else {
+          res.json({ data: result, totalCount, pageSize, totalPages }); // Include totalPages in the response
+        }
+      });
     }
   });
 };
+
+
 
 
 
