@@ -29,7 +29,7 @@ const getAllBugs = (req, res) => {
   console.log("User ID:", user_id); // Log the user ID
 
   const sqlSelect =
-      "SELECT id, title, description, Status, Severity, AssignedTo, ReportedBy, CreatedAt, UpdatedAt FROM Bugs WHERE user_id = ? LIMIT ? OFFSET ?";
+      "SELECT id, title, description, Status, Severity, AssignedTo, ReportedBy, CreatedAt, UpdatedAt FROM Bugs WHERE user_id = ? ORDER BY CreatedAt DESC LIMIT ? OFFSET ?";
   const sqlCount = "SELECT COUNT(*) AS totalCount FROM Bugs WHERE user_id = ?";
 
   db.query(sqlCount, [user_id], (err, countResult) => {
@@ -50,6 +50,7 @@ const getAllBugs = (req, res) => {
     }
   });
 };
+
 
 
 

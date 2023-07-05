@@ -218,10 +218,14 @@ fetch("http://localhost:5000/api/bugs", {
 })
     .then((response) => response.json())
     .then((data) => {
-        // Loop through the bugs data and generate table rows
-        data.forEach((bug) => {
-            displayBug(bug.id, bug.title, bug.description, bug.Status, bug.Severity, bug.AssignedTo, bug.ReportedBy, bug.CreatedAt, bug.UpdatedAt);
-        });
+        if (Array.isArray(data)) {
+            // Loop through the bugs data and generate table rows
+            data.forEach((bug) => {
+                displayBug(bug.id, bug.title, bug.description, bug.Status, bug.Severity, bug.AssignedTo, bug.ReportedBy, bug.CreatedAt, bug.UpdatedAt);
+            });
+        } else {
+            console.log("Invalid bugs data:", data);
+        }
     })
     .catch((error) => {
         console.log("Error retrieving bugs:", error);
@@ -294,8 +298,10 @@ function removeBugFromTable(bugId) {
         rowToRemove.remove();
     }
 }
-// Add a global variable to keep track of the current page
+// Add a global variable to keep track of the current page and total pages
 let currentPage = 1;
+let totalPages = 1;
+
 function fetchAndDisplayBugs(page = currentPage) {
     const token = getToken();
     const url = `http://localhost:5000/api/bugs?page=${page}`;
@@ -332,8 +338,12 @@ function fetchAndDisplayBugs(page = currentPage) {
                 );
             });
 
+            // Update the total pages
+            const totalCount = data.totalCount;
+            const pageSize = data.pageSize;
+            totalPages = Math.ceil(totalCount / pageSize);
+
             // Generate the pagination links based on the total number of pages
-            const totalPages = data.totalPages;
             generatePaginationLinks(totalPages);
         })
         .catch((error) => {
@@ -345,52 +355,33 @@ function generatePaginationLinks(totalPages) {
     const paginationContainer = document.querySelector(".pagination");
     paginationContainer.innerHTML = ""; // Clear existing pagination links
 
-    // Create the "Previous" link
-    const previousLink = document.createElement("li");
-    previousLink.classList.add("page-item");
-    previousLink.innerHTML = `
-        <a class="page-link" href="#" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
-            <span class="sr-only">Previous</span>
-        </a>
-    `;
-    previousLink.addEventListener("click", () => {
-        if (currentPage > 1) {
-            fetchAndDisplayBugs(currentPage - 1);
-        }
-    });
+    const previousLink = createPageLink("Previous", currentPage - 1);
     paginationContainer.appendChild(previousLink);
 
-    // Create a link for each page
-    for (let page = 1; page <= totalPages; page++) {
-        const pageLink = document.createElement("li");
-        pageLink.classList.add("page-item");
-        pageLink.innerHTML = `<a class="page-link" href="#">${page}</a>`;
+    const startPage = Math.max(1, currentPage - 1);
+    const endPage = Math.min(totalPages, startPage + 2);
 
-        // Highlight the current page
-        if (page === currentPage) {
-            pageLink.classList.add("active");
-        }
-
-        pageLink.addEventListener("click", () => {
-            fetchAndDisplayBugs(page);
-        });
+    for (let page = startPage; page <= endPage; page++) {
+        const pageLink = createPageLink(page, page);
         paginationContainer.appendChild(pageLink);
     }
 
-    // Create the "Next" link
-    const nextLink = document.createElement("li");
-    nextLink.classList.add("page-item");
-    nextLink.innerHTML = `
-        <a class="page-link" href="#" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
-            <span class="sr-only">Next</span>
-        </a>
-    `;
-    nextLink.addEventListener("click", () => {
-        if (currentPage < totalPages) {
-            fetchAndDisplayBugs(currentPage + 1);
-        }
-    });
+    const nextLink = createPageLink("Next", currentPage + 1);
     paginationContainer.appendChild(nextLink);
 }
+
+function createPageLink(label, page) {
+    const pageLink = document.createElement("li");
+    pageLink.classList.add("page-item");
+    const linkClass = page === currentPage ? "page-link active" : "page-link";
+    pageLink.innerHTML = `<a class="${linkClass}" href="#">${label}</a>`;
+    pageLink.addEventListener("click", () => {
+        if (page !== currentPage && page >= 1 && page <= totalPages) {
+            fetchAndDisplayBugs(page);
+        }
+    });
+    return pageLink;
+}
+
+
+
