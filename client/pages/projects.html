@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Project Management</title>
+  <link rel="stylesheet" href="../style/project.css">
+</head>
+<body>
+<h1>Project Management</h1>
+
+<h2>Create Project</h2>
+<form id="projectForm">
+  <label for="projectName">Project Name:</label><br>
+  <input type="text" id="projectName" name="projectName"><br>
+  <label for="projectDescription">Project Description:</label><br>
+  <input type="text" id="projectDescription" name="projectDescription"><br>
+  <button type="submit" id="createProjectButton">Create Project</button>
+</form>
+
+<h2>Projects</h2>
+<table id="projectTable">
+  <thead>
+  <tr>
+    <th>Project Name</th>
+    <th>Project Description</th>
+  </tr>
+  </thead>
+  <tbody id="projectList"></tbody>
+</table>
+
+<button id="fetchProjectsButton">Fetch Projects</button>
+
+<script src="../scripts/projects.js"></script> <!-- Replace with the path to your JavaScript file -->
+</body>
+</html>
