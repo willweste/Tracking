@@ -72,3 +72,13 @@ h1 {
 #fetchProjectsButton:hover {
     background-color: #45a049;
 }
+
+/* Adjusted styles for project table and description column */
+#projectTable {
+    table-layout: fixed;
+}
+
+#projectTable td:nth-child(2) {
+    width: 300px;
+    word-wrap: break-word;
+}
