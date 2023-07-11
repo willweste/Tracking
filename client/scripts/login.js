@@ -32,7 +32,7 @@ loginForm.addEventListener("submit", async function (event) {
       localStorage.setItem("token", data.accessToken);
 
       // Redirect to the index page
-      window.location.href = "index.html";
+      window.location.href = "projects.html";
     } else {
       // User login failed
       throw new Error("Error logging in: " + response.status);
