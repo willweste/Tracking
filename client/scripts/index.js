@@ -13,7 +13,7 @@ function getToken() {
     return token;
 }
 
-// Function to get the refresh token from cookies
+// Function to get the refresh token from cookiess
 function getRefreshToken() {
     const refreshToken = document.cookie
         .split("; ")

@@ -54,6 +54,27 @@ function clearProjectForm() {
     projectDescriptionInput.value = "";
 }
 
+// Add event listener to the project form submit event
+projectForm.addEventListener("submit", handleProjectFormSubmit);
+
+// Fetch and display projects on page load
+fetchAndDisplayProjects();
+
+// Add logout functionality
+const logoutButton = document.getElementById("logoutButton");
+logoutButton.addEventListener("click", () => {
+    // Clear the stored token and refresh token
+    const token = getToken();
+    const refreshToken = getRefreshToken();
+    localStorage.removeItem("token");
+    document.cookie = `refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    console.log("JWT Token deleted:", token); // Log the JWT token
+    console.log("Refresh Token deleted:", refreshToken); // Log the refresh token
+    // Redirect to the signup page
+    window.location.href = "signup.html";
+});
+
+// Fetch user data and display the logged-in user
 // Function to fetch and display projects
 function fetchAndDisplayProjects() {
     const token = getToken();
@@ -81,6 +102,22 @@ function fetchAndDisplayProjects() {
                 row.appendChild(nameCell);
                 row.appendChild(descriptionCell);
                 projectList.appendChild(row);
+
+                // Add click event listener to each row
+                row.addEventListener("click", () => {
+                    // Remove the 'selected-project' class from all rows
+                    const rows = document.querySelectorAll("#projectList tr");
+                    rows.forEach((row) => {
+                        row.classList.remove("selected-project");
+                    });
+
+                    // Add the 'selected-project' class to the clicked row
+                    row.classList.add("selected-project");
+
+                    // Handle row click event, e.g., redirect to project details page
+                    // Replace "project-details.html" with the path to your project details page
+                    window.location.href = `project-details.html?id=${project.id}`;
+                });
             });
         })
         .catch((error) => {
@@ -88,72 +125,6 @@ function fetchAndDisplayProjects() {
         });
 }
 
-// Add event listener to the project form submit event
-projectForm.addEventListener("submit", handleProjectFormSubmit);
-
-// Fetch and display projects on page load
-fetchAndDisplayProjects();
-
-// Add logout functionality
-const logoutButton = document.getElementById("logoutButton");
-logoutButton.addEventListener("click", () => {
-    // Clear the stored token and refresh token
-    const token = getToken();
-    const refreshToken = getRefreshToken();
-    localStorage.removeItem("token");
-    document.cookie = `refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-    console.log("JWT Token deleted:", token); // Log the JWT token
-    console.log("Refresh Token deleted:", refreshToken); // Log the refresh token
-    // Redirect to the signup page
-    window.location.href = "signup.html";
-});
-
-// Fetch user data and display the logged-in user
-fetchUserData();
-
-function fetchUserData() {
-    const token = getToken();
-
-    fetch("http://localhost:5000/api/users/me", {
-        method: "GET",
-        headers: {
-            Authorization: `Bearer ${token}`, // Include the authentication token in the headers
-        },
-        credentials: "include", // Include cookies in the request
-    })
-        .then((response) => {
-            if (response.ok) {
-                return response.json();
-            } else if (response.status === 401) {
-                console.log("Access token expired"); // Log when the access token has expired
-                // Access token expired, attempt token refreshing
-                return refreshAccessToken().then((newAccessToken) => {
-                    console.log("New access token generated:", newAccessToken); // Log the new access token
-                    // Retry the fetch request with the new access token
-                    return fetch("http://localhost:5000/api/users/me", {
-                        method: "GET",
-                        headers: {
-                            Authorization: `Bearer ${newAccessToken}`,
-                        },
-                        credentials: "include", // Include cookies in the request
-                    });
-                });
-            } else {
-                throw new Error("Error retrieving user data");
-            }
-        })
-        .then((data) => {
-            const { username } = data;
-            console.log("Logged-in username:", username);
-            const usernameElement = document.getElementById("username");
-            usernameElement.textContent = `Username: ${username}`;
-        })
-        .catch((error) => {
-            console.log("Error retrieving user data:", error);
-            // Handle the error, e.g., redirect the user to the login page
-            window.location.href = "login.html";
-        });
-}
 
 // Function to get the refresh token from cookies
 function getRefreshToken() {

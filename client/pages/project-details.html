@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Project Details</title>
+    <link rel="stylesheet" href="../style/project-details.css">
+</head>
+<body>
+
+
+<div class="header-right">
+    <button id="backButton">Back</button>
+</div>
+
+<h1>Project Details</h1>
+
+<div id="projectInfo">
+    <h2>Project Information</h2>
+    <div>
+        <label for="projectName">Project Name:</label>
+        <input type="text" id="projectName" readonly>
+    </div>
+    <div>
+        <label for="projectDescription">Project Description:</label>
+        <textarea id="projectDescription" readonly></textarea>
+    </div>
+    <div>
+        <label for="startDate">Start Date:</label>
+        <input type="text" id="startDate" readonly>
+    </div>
+    <div>
+        <label for="endDate">End Date:</label>
+        <input type="text" id="endDate" readonly>
+    </div>
+    <div>
+        <label for="status">Status:</label>
+        <select id="status" disabled>
+            <option value="not-started">Not Started</option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+        </select>
+    </div>
+</div>
+
+<h2>Tasks</h2>
+<table id="taskTable">
+    <thead>
+    <tr>
+        <th>Task Name</th>
+        <th>Assigned To</th>
+        <th>Status</th>
+    </tr>
+    </thead>
+    <tbody id="taskList"></tbody>
+</table>
+
+<script src="../scripts/project-details.js"></script> <!-- Replace with the path to your JavaScript file -->
+</body>
+</html>
